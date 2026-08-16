@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">Nmedia</string>
+    <string name="nmedia">NMedia!</string>
+    <string name="description_post_author_avatar">Post author avatar</string>
+    <string name="remove_menu">Remove</string>
+    <string name="post_input_hint">Post content</string>
+    <string name="content_is_blank_error">Content is blank!</string>
+    <string name="menu_remove">Remove</string>
+    <string name="post_text">Post Text</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_save">Save</string>
+    <string name="like">Like</string>
+    <string name="views">Views</string>
+    <string name="share">Share</string>
+    <string name="remove">Remove</string>
+    <string name="edit">Edit</string>
+    <string name="description_post_share" />
+    <string name="error_empty_content"/>
+    <string name="description_post_save" />
+    <string name="description_background_video" />
+    <string name="description_play"/>
+    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
+    <string name="network_error">Network error</string>
+    <string name="no_posts">No posts</string>
+    <string name="avatar_description" />
+    <string name="retry_loading">retry</string>
+    <string name="chooser_share_post" />
+    <string name="error_loading" >Error loading</string>
+    <string name="empty_posts">Load posts</string>
+    <string name="add_post" >add post</string>
+    <string name="description_post_like" />
+    <string name="description_post_menu" />
+    <string name="google_play_unavailable">Google Api Unavailable</string>
+    <string name="new_posts_available">New posts</string>
+    <string name="enter">Enter field</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="go_enter">Go enter</string>
+    <string name="registration">Registration</string>
+    <string name="name">Name</string>
+    <string name="password_confirmation">Password confirmation</string>
+    <string name="register">Register</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="description_select_photo">Select photo</string>
+    <string name="description_take_photo">Take photo</string>
+    <string name="description_photo">Photo</string>
+    <string name="full_screen_image">Full screen image</string>
+    <string name="post_image">Post image</string>
+
+
+</resources>
