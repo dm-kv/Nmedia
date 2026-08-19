@@ -5,21 +5,19 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.lifecycle.viewModelScope
-import ru.netology.nmedia.auth.AppAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModelProvider
-import ru.netology.nmedia.di.DependencyContainer
-import ru.netology.nmedia.repository.PostRepository
+import ru.netology.nmedia.auth.AppAuth
+import javax.inject.Inject
 
-
-class RegisterViewModel(
-    private val repository: AuthRepository,
-    appAuth: AppAuth,
-
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     ) : ViewModel() {
 
-    private val dependencyContainer = DependencyContainer.getInstance()
+    @Inject
+    lateinit var appAuth: AppAuth
 
     private val _uiState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
@@ -28,8 +26,8 @@ class RegisterViewModel(
         viewModelScope.launch {
             _uiState.value = RegisterUiState.Loading
             try {
-                val response = repository.registerUser(login, pass, name)
-                dependencyContainer.appAuth.setAuth(response.id, response.token)
+                val response = authRepository.registerUser(login, pass, name)
+                appAuth.setAuth(response.id, response.token)
                 _uiState.value = RegisterUiState.Success
             } catch (e: Exception) {
                 _uiState.value = RegisterUiState.Error(e.message ?: "Ошибка регистрации")
@@ -39,15 +37,7 @@ class RegisterViewModel(
 }
 
 
-class RegisterViewModelFactory(private val repository: AuthRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RegisterViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return RegisterViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+
 
 
 sealed class RegisterUiState {

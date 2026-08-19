@@ -5,18 +5,19 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import androidx.lifecycle.ViewModelProvider
-import ru.netology.nmedia.di.DependencyContainer
+import javax.inject.Inject
 
-
-class LoginViewModel(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     private val repository: AuthRepository,
     ) : ViewModel() {
 
-    private val dependencyContainer = DependencyContainer.getInstance()
+    @Inject
+    lateinit var appAuth: AppAuth
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -26,7 +27,7 @@ class LoginViewModel(
             _uiState.value = LoginUiState.Loading
             try {
                 val response = repository.authenticate(login, password)
-                dependencyContainer.appAuth.setAuth(response.id, response.token)
+                appAuth.setAuth(response.id, response.token)
                 _uiState.value = LoginUiState.Success
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "Ошибка входа")
@@ -35,16 +36,6 @@ class LoginViewModel(
     }
 }
 
-
-class LoginViewModelFactory(private val repository: AuthRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return LoginViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 
 

@@ -1,9 +1,16 @@
 package ru.netology.nmedia.auth
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppAuth (context: Context) {
+@Singleton
+class AppAuth @Inject constructor(
+    @ApplicationContext
+    context: Context
+) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
     private val tokenKey = "token"

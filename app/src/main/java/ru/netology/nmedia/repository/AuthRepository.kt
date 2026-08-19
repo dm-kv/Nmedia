@@ -2,8 +2,11 @@ package ru.netology.nmedia.repository
 
 import ru.netology.nmedia.api.AuthResponse
 import ru.netology.nmedia.api.AuthApi
+import javax.inject.Inject
 
-class AuthRepository(private val api: AuthApi) {
+class AuthRepository @Inject constructor(
+    private val api: AuthApi
+) {
     suspend fun authenticate(login: String, pass: String): AuthResponse =
         api.authenticate(login, pass)
 

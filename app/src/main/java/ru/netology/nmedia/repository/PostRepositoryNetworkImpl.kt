@@ -21,9 +21,10 @@ import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.AppError
+import javax.inject.Inject
 
 
-class PostRepositoryNetworkImpl(
+class PostRepositoryNetworkImpl @Inject constructor(
     private val dao: PostDao,
     private val apiService: PostsApiService,
     ) : PostRepository {

@@ -3,7 +3,6 @@ package ru.netology.nmedia.activity
 import androidx.fragment.app.Fragment
 import ru.netology.nmedia.databinding.FragmentLoginBinding
 import ru.netology.nmedia.viewmodel.LoginViewModel
-import ru.netology.nmedia.repository.AuthRepository
 import androidx.fragment.app.viewModels
 import android.view.LayoutInflater
 import android.os.Bundle
@@ -16,23 +15,18 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
 import ru.netology.nmedia.viewmodel.LoginUiState
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.di.DependencyContainer
-import ru.netology.nmedia.viewmodel.LoginViewModelFactory
-import ru.netology.nmedia.utils.RetrofitClient
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(AuthRepository(RetrofitClient.authApi))
-
-
-    }
+    private val viewModel: LoginViewModel by viewModels ()
 
     override fun onCreateView(
         inflater: LayoutInflater,

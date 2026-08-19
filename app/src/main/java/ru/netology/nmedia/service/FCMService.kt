@@ -17,15 +17,20 @@ import android.util.Log
 import android.content.ContentValues.TAG
 import android.app.PendingIntent
 import android.content.Intent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.jvm.java
 import ru.netology.nmedia.activity.AppActivity
+import ru.netology.nmedia.auth.AppAuth
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FCMService: FirebaseMessagingService() {
 
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
 
     override fun onCreate() {
         super.onCreate()

@@ -24,19 +24,17 @@ import ru.netology.nmedia.fragment.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.ActivityAppBinding
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import androidx.appcompat.app.AlertDialog
-import ru.netology.nmedia.di.DependencyContainer
-import ru.netology.nmedia.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
+import ru.netology.nmedia.auth.AppAuth
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
-    private val dependencyContainer = DependencyContainer.getInstance()
-    private val viewModel: AuthViewModel by viewModels(
-        factoryProducer = {
-            ViewModelFactory(
-                dependencyContainer.repository,
-                dependencyContainer.appAuth
-            )}
-    )
+
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,7 +104,7 @@ class AppActivity : AppCompatActivity() {
                             .setTitle("Выход из аккаунта")
                             .setMessage("Вы уверены, что хотите выйти?")
                             .setPositiveButton("Да") { _, _ ->
-                                dependencyContainer.appAuth.removeAuth()
+                                appAuth.removeAuth()
                                 val navController = findNavController(R.id.nav_host_fragment)
                                 if (navController.currentDestination?.id != R.id.feedFragment) {
                                     navController.popBackStack(R.id.feedFragment, inclusive = false)

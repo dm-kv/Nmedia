@@ -4,9 +4,7 @@ package ru.netology.nmedia.activity
 import androidx.fragment.app.Fragment
 import ru.netology.nmedia.viewmodel.RegisterViewModel
 import android.view.LayoutInflater
-import ru.netology.nmedia.repository.AuthRepository
 import androidx.fragment.app.viewModels
-import ru.netology.nmedia.utils.RetrofitClient
 import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
@@ -17,26 +15,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import androidx.lifecycle.repeatOnLifecycle
-import ru.netology.nmedia.viewmodel.RegisterViewModelFactory
 import ru.netology.nmedia.databinding.FragmentRegisterBinding
-import ru.netology.nmedia.di.DependencyContainer
-import ru.netology.nmedia.viewmodel.ViewModelFactory
 
 
 class RegisterFragment : Fragment() {
 
-    private val dependencyContainer = DependencyContainer.getInstance()
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: RegisterViewModel by viewModels {
-        factoryProducer = {
-            ViewModelFactory(
-                dependencyContainer.repository,
-                dependencyContainer.appAuth
-            )}
-    }
+    private val viewModel: RegisterViewModel by viewModels ()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

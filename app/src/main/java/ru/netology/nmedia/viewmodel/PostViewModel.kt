@@ -18,12 +18,15 @@ import kotlinx.coroutines.flow.catch
 import android.util.Log
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.PhotoModel
+import ru.netology.nmedia.repository.AuthRepository
 import ru.netology.nmedia.repository.PostRepository
+import javax.inject.Inject
 import kotlin.Boolean
 import kotlin.Long
 
@@ -45,9 +48,10 @@ private val empty = Post(
 
 private val noPhoto = PhotoModel()
 
-@ExperimentalCoroutinesApi
-class PostViewModel(
+@HiltViewModel
+class PostViewModel @Inject constructor(
     private val repository: PostRepository,
+    authRepository: AuthRepository,
     appAuth: AppAuth,
 ): ViewModel() {
 
