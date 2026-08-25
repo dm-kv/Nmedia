@@ -23,6 +23,7 @@ import ru.netology.nmedia.utils.LongArg
 import ru.netology.nmedia.fragment.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.viewmodel.PostUiEvent
 
+
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
 
