@@ -9,6 +9,7 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
 import javax.inject.Inject
 
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val appAuth: AppAuth,
