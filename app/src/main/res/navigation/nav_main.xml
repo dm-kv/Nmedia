@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="ru.netology.nmedia.activity.RegisterFragment"
+        android:name="ru.netology.nmedia.fragment.RegisterFragment"
         android:label="RegisterFragment"
         tools:layout="@layout/fragment_register" />
 

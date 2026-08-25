@@ -1,4 +1,4 @@
-package ru.netology.nmedia.activity
+package ru.netology.nmedia.fragment
 
 import androidx.fragment.app.Fragment
 import ru.netology.nmedia.databinding.FragmentLoginBinding
@@ -16,8 +16,7 @@ import androidx.lifecycle.Lifecycle
 import ru.netology.nmedia.viewmodel.LoginUiState
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ru.netology.nmedia.auth.AppAuth
-import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -52,7 +51,7 @@ class LoginFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     when (state) {
                         is LoginUiState.Success -> {
