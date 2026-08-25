@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+
     private val appAuth: AppAuth,
 ) : ViewModel() {
     val data: LiveData<AuthState> = appAuth
