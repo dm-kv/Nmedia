@@ -3,6 +3,7 @@ package ru.netology.nmedia.activity
 import android.app.Activity
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -86,19 +87,15 @@ class NewPostFragment : Fragment() {
             viewModel.changePhoto(null)
         }
 
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            findNavController().navigateUp()
-        }
-
         viewModel.photo.observe(viewLifecycleOwner) {
             if (it.uri == null) {
                 binding.photoContainer.visibility = View.GONE
                 return@observe
             }
-
             binding.photoContainer.visibility = View.VISIBLE
             binding.photo.setImageURI(it.uri)
         }
+
 
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -108,16 +105,22 @@ class NewPostFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
                     R.id.save -> {
-                        fragmentBinding?.let {
-                            viewModel.changeContent(it.edit.text.toString())
-                            viewModel.save()
+                        fragmentBinding?.let { binding ->
+                            val content = binding.edit.text.toString().trim()
+                            if (content.isEmpty()) {
+                                Toast.makeText(context, "Введите текст", Toast.LENGTH_SHORT).show()
+                                return@let
+                            }
+                            viewModel.changeContent(content)
+                            viewModel.save(viewModel.photo.value?.uri)
                             AndroidUtils.hideKeyboard(requireView())
+
+                            findNavController().popBackStack()
                         }
                         true
                     }
                     else -> false
                 }
-
         }, viewLifecycleOwner)
 
         return binding.root

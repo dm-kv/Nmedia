@@ -2,50 +2,44 @@ package ru.netology.nmedia.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import kotlinx.coroutines.CancellationException
-import ru.netology.nmedia.api.ApiService
+import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.error.ApiError
+import kotlin.collections.emptyList
 
 class PostPagingSource (
-    private val service: ApiService,
+    private val dao: PostDao,
 ) : PagingSource<Long, Post>() {
-    override fun getRefreshKey(state: PagingState<Long, Post>): Long? {
-        return null
-    }
+    override fun getRefreshKey(state: PagingState<Long, Post>): Long? = null
+
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Post> {
-        try {
-            val response = when (params) {
-                is LoadParams.Refresh -> service.getLatest(params.loadSize)
-                is LoadParams.Prepend -> return LoadResult.Page(
+        return try {
+            val key = params.key ?: 0L
+            val loadSize = params.loadSize
+
+            val result = when (params) {
+                is LoadParams.Refresh -> dao.getLatest(loadSize)
+                is LoadParams.Append -> dao.getBefore(key, loadSize)
+                is LoadParams.Prepend -> emptyList()
+            }
+
+            if (result.isEmpty()) {
+                return LoadResult.Page(
                     data = emptyList(),
-                    prevKey = params.key,
+                    prevKey = null,
                     nextKey = null
                 )
-                is LoadParams.Append -> service.getBefore(params.key, params.loadSize)
             }
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(
-                response.code(),
-                response.message(),
-            )
+            val nextKey = if (result.size == loadSize) result.last().id else null
 
-            val nextKey = if (body.isEmpty()) null else body.last().id
-            return LoadResult.Page(
-                data = body,
+            LoadResult.Page(
+                data = result.map { it.toDto() },
                 prevKey = params.key,
                 nextKey = nextKey,
             )
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            }
-
-            return LoadResult.Error(e)
+            LoadResult.Error(e)
         }
     }
 }

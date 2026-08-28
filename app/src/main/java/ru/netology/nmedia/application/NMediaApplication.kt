@@ -22,7 +22,6 @@ class NMediaApplication : Application() {
 
     private fun setupAuth() {
         appScope.launch {
-            auth.sendPushToken()
         }
     }
 }

@@ -1,27 +1,13 @@
 package ru.netology.nmedia.auth
 
 import android.content.Context
-import com.google.firebase.Firebase
-import com.google.firebase.messaging.messaging
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import ru.netology.nmedia.api.ApiService
-import ru.netology.nmedia.dto.PushToken
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+
 
 @Singleton
 class AppAuth @Inject constructor(
@@ -31,32 +17,20 @@ class AppAuth @Inject constructor(
     private val idKey = "id"
     private val tokenKey = "token"
 
-    private val _authStateFlow: MutableStateFlow<AuthState>
-
-    val reloadTrigger = MutableSharedFlow<Unit>()
+    private val _authStateFlow = MutableStateFlow(AuthState())
 
     init {
         val id = prefs.getLong(idKey, 0)
         val token = prefs.getString(tokenKey, null)
 
-        if (id == 0L || token == null) {
-            _authStateFlow = MutableStateFlow(AuthState())
-            with(prefs.edit()) {
-                clear()
-                apply()
-            }
+        if (id != 0L || token != null) {
+            _authStateFlow.value = AuthState(id, token)
         } else {
-            _authStateFlow = MutableStateFlow(AuthState(id, token))
+            with(prefs.edit()) { clear(); apply() }
         }
     }
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
-
-    @InstallIn(SingletonComponent::class)
-    @EntryPoint
-    interface AppAuthEntryPoint {
-        fun apiService(): ApiService
-    }
 
     @Synchronized
     fun setAuth(id: Long, token: String) {
@@ -66,44 +40,12 @@ class AppAuth @Inject constructor(
             putString(tokenKey, token)
             apply()
         }
-        sendPushToken()
-        CoroutineScope(Dispatchers.IO).launch {
-            reloadTrigger.emit(Unit)
-        }
     }
 
     @Synchronized
     fun removeAuth() {
         _authStateFlow.value = AuthState()
-        with(prefs.edit()) {
-            clear()
-            apply()
-        }
-        sendPushToken()
-        CoroutineScope(Dispatchers.IO).launch {
-            reloadTrigger.emit(Unit)
-        }
-    }
-
-    fun getReloadTrigger(): SharedFlow<Unit> = reloadTrigger
-
-    fun sendPushToken(token: String? = null) {
-        CoroutineScope(Dispatchers.Default).launch {
-            try {
-                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
-                getApiService(context).save(pushToken)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun getApiService(context: Context): ApiService {
-        val hiltEntryPoint = EntryPointAccessors.fromApplication(
-            context,
-            AppAuthEntryPoint::class.java
-        )
-        return hiltEntryPoint.apiService()
+        with(prefs.edit()) { clear(); apply() }
     }
 }
 

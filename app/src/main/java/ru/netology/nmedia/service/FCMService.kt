@@ -38,8 +38,4 @@ class FCMService : FirebaseMessagingService() {
         // TODO: replace this in homework
         println(message.data["content"])
     }
-
-    override fun onNewToken(token: String) {
-        auth.sendPushToken(token)
-    }
 }

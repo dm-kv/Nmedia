@@ -1,22 +1,19 @@
 package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
-import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.dto.MediaUpload
+import kotlin.time.Clock
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
 import javax.inject.Inject
 
@@ -29,15 +26,17 @@ private val empty = Post(
     likedByMe = false,
     likes = 0,
     published = "",
+    photoPath = "",
+    attachment = null,
+    ownedByMe = false,
 )
 
 private val noPhoto = PhotoModel()
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PostViewModel @Inject constructor(
     private val repository: PostRepository,
-    auth: AppAuth,
+    private val auth: AppAuth,
 ) : ViewModel() {
     private val cached = repository
         .data
@@ -66,54 +65,47 @@ class PostViewModel @Inject constructor(
         get() = _photo
 
     init {
-        viewModelScope.launch {
-            auth.getReloadTrigger().collect {
-                if (repository is PostRepositoryImpl) {
-                    repository.invalidatePagingSource()
-                }
-            }
-        }
+        loadPosts()
     }
 
     fun loadPosts() = viewModelScope.launch {
         try {
             _dataState.value = FeedModelState(loading = true)
-            // repository.stream.cachedIn(viewModelScope).
+            repository.getAll()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
         }
     }
 
-    fun refreshPosts() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(refreshing = true)
-//            repository.getAll()
-            if (repository is PostRepositoryImpl) {
-                repository.invalidatePagingSource()
-            }
-            _dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
+    fun save(photoUri: Uri?) = viewModelScope.launch {
+        val content = edited.value?.content.orEmpty()
+        if (content.isBlank()) return@launch
 
-    fun save() {
-        edited.value?.let {
-            viewModelScope.launch {
-                try {
-                    repository.save(
-                        it, _photo.value?.uri?.let { MediaUpload(it.toFile()) }
-                    )
-
-                    _postCreated.value = Unit
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+        val authState = auth.authStateFlow.value
+        val authorId = authState.id
+        if (authorId == 0L) {
+            return@launch
         }
-        edited.value = empty
-        _photo.value = noPhoto
+
+        val photoPath = photoUri?.path
+
+        val post = Post(
+            id = 0L,
+            authorId = authorId,
+            author = "Me",
+            authorAvatar = "",
+            content = content,
+            published = Clock.System.now().toString(),
+            likedByMe = false,
+            likes = 0,
+            ownedByMe = true,
+            photoPath = photoPath,
+            attachment = null,
+        )
+
+        repository.save(post, null)
+        _postCreated.value = Unit
     }
 
     fun edit(post: Post) {
@@ -132,11 +124,11 @@ class PostViewModel @Inject constructor(
         _photo.value = PhotoModel(uri)
     }
 
-    fun likeById(id: Long) {
-        TODO()
+    fun likeById(id: Long) = viewModelScope.launch {
+        repository.likeById(id)
     }
 
-    fun removeById(id: Long) {
-        TODO()
+    fun removeById(id: Long) = viewModelScope.launch {
+        repository.removeById(id)
     }
 }
