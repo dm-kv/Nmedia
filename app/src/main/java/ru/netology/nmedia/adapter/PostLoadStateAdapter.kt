@@ -43,6 +43,7 @@ class PostLoadStateViewHolder(
 
     fun bind(loadState: LoadState) {
         binding.apply {
+            root.isVisible = loadState is LoadState.Loading || loadState is LoadState.Error
             progressBar.isVisible = loadState is LoadState.Loading
             retryButton.isVisible = loadState is LoadState.Error
             errorMsg.isVisible = loadState is LoadState.Error

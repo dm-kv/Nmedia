@@ -22,6 +22,7 @@ import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.repository.DateSeparatorDecoration
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.viewmodel.PostViewModel
 import javax.inject.Inject
@@ -68,12 +69,12 @@ class FeedFragment : Fragment() {
             }
         })
 
-
-        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+        val listAdapter = adapter.withLoadStateHeaderAndFooter(
             header = PostLoadStateAdapter { adapter.retry() },
             footer = PostLoadStateAdapter { adapter.retry() },
         )
-
+        binding.list.adapter = listAdapter
+        binding.list.addItemDecoration(DateSeparatorDecoration(adapter, listAdapter))
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -89,6 +90,7 @@ class FeedFragment : Fragment() {
                 }
             }
         }
+
 
         binding.swiperefresh.setOnRefreshListener {
             adapter.refresh()
